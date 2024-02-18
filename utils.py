@@ -22,7 +22,7 @@ logging.basicConfig(level=logging.INFO,
 logger = logging.getLogger()
 
 def get_default_credential():
-    return AccessKeyCredential('LTAI5tRcweqK1bv2Q6hXGHEP', 'P4VKMpT4QEa1E56OmL9YatSnG6iMuL')
+    return AccessKeyCredential('%ACCESS_KEY%', '%ACCESS_SECRET%')
 
 def get_client(region_id="ap-southeast-1"):
     credentials = get_default_credential()
