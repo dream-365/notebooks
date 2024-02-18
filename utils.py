@@ -22,7 +22,7 @@ logging.basicConfig(level=logging.INFO,
 logger = logging.getLogger()
 
 def get_default_credential():
-    return AccessKeyCredential('%ACCESS_KEY%', '%ACCESS_SECRET%')
+    return AccessKeyCredential('LTAI5tRcweqK1bv2Q6hXGHEP', 'P4VKMpT4QEa1E56OmL9YatSnG6iMuL')
 
 def get_client(region_id="ap-southeast-1"):
     credentials = get_default_credential()
@@ -156,6 +156,7 @@ def run_command(instance_id, cmdcontent):
         request.set_Type("RunShellScript")
         request.set_CommandContent(cmdcontent)
         request.set_InstanceIds([instance_id])
+        request.set_Username("root")
         request.set_Timeout(600)
       
         response = client.do_action_with_exception(request)
