@@ -1,3 +1,4 @@
+import os
 import logging
 import json
 import time
@@ -21,8 +22,24 @@ logging.basicConfig(level=logging.INFO,
 
 logger = logging.getLogger()
 
+class Bootstrap:
+    def __init__(self, json_file_path):
+        self.json_file_path = json_file_path
+
+    def load_config_from_json(self):
+        with open(self.json_file_path, 'r') as file:
+            self.config = json.load(file)
+
+    def set_environment_variables(self):
+        for key, value in self.config.items():
+            os.environ[key] = value
+
+    def run(self):
+        self.load_config_from_json()
+        self.set_environment_variables()
+
 def get_default_credential():
-    return AccessKeyCredential('%ACCESS_KEY%', '%ACCESS_SECRET%')
+    return AccessKeyCredential(os.environ.get("ACCESS_KEY"), os.environ.get("ACCESS_SECRET"))
 
 def get_client(region_id="ap-southeast-1"):
     credentials = get_default_credential()
