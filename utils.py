@@ -298,16 +298,3 @@ docker run -itd --rm -p 10000:8888 \
     quay.io/jupyter/base-notebook \
     start-notebook.py --ServerApp.token=abcd
 """
-
-def start(biz_tags=[], execution_queue=None):
-    aliyun_ecs_manager = AliyunECSManager()
-    settings = aliyun_ecs_manager.create_default_settings()
-    settings.set_biz_tags(biz_tags)
-
-    vm_property = aliyun_ecs_manager.create_instance(settings)
-
-    # wait for init
-    time.sleep(30)
-    cmd_content = "\n".join(execution_queue)
-  
-    aliyun_ecs_manager.execute_command(vm_property.instance_id, cmd_content)
