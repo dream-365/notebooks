@@ -233,7 +233,7 @@ class AliyunECSManager:
         settings.set_host_name('sg-001')
         settings.set_image_id("aliyun_3_x64_20G_qboot_alibase_20230727.vhd")
         settings.set_password("Aliyun$2022!")
-        settings.set_instance_type("ecs.g6.xlarge")
+        settings.set_instance_type("ecs.g6.large")
         settings.set_system_disk_size(80)
         settings.set_system_disk_category("cloud_essd")
         settings.set_system_disk_performance_level("PL0")
@@ -295,6 +295,6 @@ docker run -itd --rm -p 10000:8888 \
     --user root \
     -e CHOWN_EXTRA="/home/jovyan/work" \
     -e CHOWN_EXTRA_OPTS="-R" \
-    quay.io/jupyter/base-notebook \
+    quay.io/jupyter/pyspark-notebook \
     start-notebook.py --ServerApp.token=abcd
 """
