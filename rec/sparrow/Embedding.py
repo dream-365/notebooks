@@ -67,17 +67,16 @@ def embeddingLSH(spark, movieEmbMap):
 def trainItem2vec(spark, samples, embLength, embOutputPath, saveToRedis, redisKeyPrefix):
     word2vec = Word2Vec().setVectorSize(embLength).setWindowSize(5).setNumIterations(10)
     model = word2vec.fit(samples)
-    synonyms = model.findSynonyms("158", 20)
-    for synonym, cosineSimilarity in synonyms:
-        print(synonym, cosineSimilarity)
+    
     embOutputDir = '/'.join(embOutputPath.split('/')[:-1])
     if not os.path.exists(embOutputDir):
         os.makedirs(embOutputDir)
+        
     with open(embOutputPath, 'w') as f:
         for movie_id in model.getVectors():
             vectors = " ".join([str(emb) for emb in model.getVectors()[movie_id]])
             f.write(movie_id + ":" + vectors + "\n")
-    embeddingLSH(spark, model.getVectors())
+    # embeddingLSH(spark, model.getVectors())
     return model
 
 
@@ -160,24 +159,4 @@ def graphEmb(samples, spark, embLength, embOutputFilename, saveToRedis, redisKey
     sampleLength = 10
     newSamples = randomWalk(transitionMatrix, itemDistribution, sampleCount, sampleLength)
     rddSamples = spark.sparkContext.parallelize(newSamples)
-    trainItem2vec(spark, rddSamples, embLength, embOutputFilename, saveToRedis, redisKeyPrefix)
-
-
-def generateUserEmb(spark, rawSampleDataPath, model, embLength, embOutputPath, saveToRedis, redisKeyPrefix):
-    ratingSamples = spark.read.format("csv").option("header", "true").load(rawSampleDataPath)
-    Vectors_list = []
-    for key, value in model.getVectors().items():
-        Vectors_list.append((key, list(value)))
-    fields = [
-        StructField('movieId', StringType(), False),
-        StructField('emb', ArrayType(FloatType()), False)
-    ]
-    schema = StructType(fields)
-    Vectors_df = spark.createDataFrame(Vectors_list, schema=schema)
-    ratingSamples = ratingSamples.join(Vectors_df, on='movieId', how='inner')
-    result = ratingSamples.select('userId', 'emb').rdd.map(lambda x: (x[0], x[1])) \
-        .reduceByKey(lambda a, b: [a[i] + b[i] for i in range(len(a))]).collect()
-    with open(embOutputPath, 'w') as f:
-        for row in result:
-            vectors = " ".join([str(emb) for emb in row[1]])
-            f.write(row[0] + ":" + vectors + "\n")
+    return trainItem2vec(spark, rddSamples, embLength, embOutputFilename, saveToRedis, redisKeyPrefix)
