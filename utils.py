@@ -283,7 +283,7 @@ chmod 400 /root/.ssh/id_ed25519
 chmod 400 /root/.ssh/config
 """.format(ssh_private_key=os.environ.get("SSH_PRIVATE_KEY"))
 
-    def generate_start_jupyter_command(self):
+    def generate_start_jupyter_command(self, name="base-notebook"):
         return """
 mkdir -p /root/code
 cd /root/code
@@ -291,10 +291,10 @@ cd /root/code
 git clone git@github.com:dream-365/notebooks.git
 
 docker run -itd --rm -p 10000:8888 \
-    -v "${PWD}":/home/jovyan/work \
+    -v "${{PWD}}":/home/jovyan/work \
     --user root \
     -e CHOWN_EXTRA="/home/jovyan/work" \
     -e CHOWN_EXTRA_OPTS="-R" \
-    quay.io/jupyter/pyspark-notebook \
+    quay.io/jupyter/{name} \
     start-notebook.py --ServerApp.token=abcd
-"""
+""".format(name=name)
