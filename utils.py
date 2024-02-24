@@ -264,37 +264,34 @@ sudo docker run -e PASSWORD="passIt2020" \
     def generate_install_git_command(self):
         return "yum install git -y"
 
-    def generate_config_github_command(self):
-        return """
-git config --global user.name "Jeffrey Chen"
-git config --global user.email "support-jec@hotmail.com"
-git config --global --add safe.directory '*'
-
-cat > /root/.ssh/id_ed25519 << EOF
-{ssh_private_key}
-EOF
-
-cat > /root/.ssh/config << EOF
-Host *
-    StrictHostKeyChecking no
-EOF
-
-chmod 400 /root/.ssh/id_ed25519
-chmod 400 /root/.ssh/config
-""".format(ssh_private_key=os.environ.get("SSH_PRIVATE_KEY"))
-
     def generate_start_jupyter_command(self, name="base-notebook"):
         return """
-mkdir -p /root/code
-cd /root/code
-
-git clone git@github.com:dream-365/notebooks.git
+mkdir -p /root/work
+cd /root/work
 
 docker run -itd --rm -p 10000:8888 \
+    --name notebook \
     -v "${{PWD}}":/home/jovyan/work \
     --user root \
     -e CHOWN_EXTRA="/home/jovyan/work" \
     -e CHOWN_EXTRA_OPTS="-R" \
     quay.io/jupyter/{name} \
     start-notebook.py --ServerApp.token=abcd
-""".format(name=name)
+
+docker exec -u jovyan notebook bash -c "mkdir ~/.ssh
+
+git config --global user.name "notebook"
+git config --global user.email "notebook@email.com"
+
+cat > ~/.ssh/id_ed25519 << EOF
+{ssh_private_key}
+EOF
+
+cat > ~/.ssh/config << EOF
+Host *
+    StrictHostKeyChecking no
+EOF
+
+chmod 400 ~/.ssh/id_ed25519
+chmod 400 ~/.ssh/config"
+""".format(name=name, ssh_private_key=os.environ.get("SSH_PRIVATE_KEY"))
