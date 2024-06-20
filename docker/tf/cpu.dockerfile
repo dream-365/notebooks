@@ -6,5 +6,5 @@ RUN apt-get update && \
     apt-get install -y git wget unzip && \
     rm -rf /var/lib/apt/lists/*
 
-# 使用 pip 安装额外的 Python 包
+# 预安装
 RUN pip install --no-cache-dir deepmatch tqdm pandas scikit-learn faiss-cpu==1.7.2
