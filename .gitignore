@@ -1,3 +1,4 @@
 **/.ipynb_checkpoints/
 *.config.json
 __pycache__
+.DS_store
